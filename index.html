@@ -217,10 +217,60 @@
     width: 100%; border: none; display: block;
     min-height: 600px;
   }
-  .contact-fallback {
-    padding: 48px 32px; text-align: center;
+  /* ── CONTACT FORM ── */
+  .contact-form {
+    padding: 40px 40px 48px;
+    text-align: left;
   }
-  .contact-fallback p { color: var(--muted); margin-bottom: 24px; font-size: 0.9em; }
+  .form-group {
+    margin-bottom: 20px;
+  }
+  .form-group label {
+    display: block;
+    font-size: 0.82em;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+  }
+  .form-group input,
+  .form-group textarea {
+    width: 100%;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.95em;
+    padding: 12px 16px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+    resize: vertical;
+  }
+  .form-group input:focus,
+  .form-group textarea:focus {
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px rgba(0, 230, 118, 0.12);
+  }
+  .form-group textarea { min-height: 140px; }
+  .form-submit { margin-top: 8px; }
+  .form-submit .btn { cursor: pointer; font-family: inherit; border: none; }
+  .form-thankyou {
+    display: none;
+    padding: 48px 32px;
+    text-align: center;
+  }
+  .form-thankyou .thankyou-icon {
+    font-size: 2.8em; margin-bottom: 16px;
+  }
+  .form-thankyou h3 {
+    font-size: 1.2em; color: var(--green); margin-bottom: 10px;
+  }
+  .form-thankyou p { color: var(--muted); font-size: 0.92em; }
+  /* honeypot: 非表示 */
+  .form-honeypot { display: none !important; }
+  @media (max-width: 680px) {
+    .contact-form { padding: 28px 20px 36px; }
+  }
 
   /* ── FOOTER ── */
   footer {
@@ -371,22 +421,67 @@
     <p>お気軽にどうぞ。</p>
 
     <div class="contact-form-area">
-      <!-- ↓↓↓ Google フォームの埋め込み URL に差し替えてください ↓↓↓ -->
-      <!-- 手順: Googleフォーム → 送信 → </> タブ → iframeのsrc=""の値をコピー -->
-      <div class="contact-fallback">
-        <p>⚠️ Googleフォームの埋め込みコードをここに設定してください。</p>
-        <p style="font-size:0.8em;color:#3a5a3a;">
-          Googleフォームを作成 → 「送信」→「&lt;/&gt;」→ iframeのsrcをコピーして<br>
-          このファイルの GOOGLE_FORM_EMBED_URL を置き換えてください。
-        </p>
+
+      <!-- お問い合わせフォーム (Formspree) -->
+      <!-- FORMSPREE_ENDPOINT: https://formspree.io/f/xpwrgjdn -->
+      <form
+        id="contact-form"
+        class="contact-form"
+        action="https://formspree.io/f/xpwrgjdn"
+        method="POST"
+        novalidate
+      >
+        <!-- honeypot スパム対策 -->
+        <div class="form-honeypot" aria-hidden="true">
+          <input type="text" name="_gotcha" tabindex="-1" autocomplete="off">
+        </div>
+
+        <div class="form-group">
+          <label for="cf-name">お名前 <span style="color:var(--green)">*</span></label>
+          <input
+            id="cf-name"
+            type="text"
+            name="name"
+            placeholder="山田 太郎"
+            required
+            autocomplete="name"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="cf-email">メールアドレス <span style="color:var(--green)">*</span></label>
+          <input
+            id="cf-email"
+            type="email"
+            name="email"
+            placeholder="your@email.com"
+            required
+            autocomplete="email"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="cf-message">メッセージ <span style="color:var(--green)">*</span></label>
+          <textarea
+            id="cf-message"
+            name="message"
+            placeholder="お問い合わせ内容をご記入ください。"
+            required
+          ></textarea>
+        </div>
+
+        <div class="form-submit">
+          <button type="submit" class="btn btn-solid">送信する →</button>
+        </div>
+      </form>
+
+      <!-- 送信完了メッセージ -->
+      <div id="contact-thankyou" class="form-thankyou">
+        <div class="thankyou-icon">✅</div>
+        <h3>お送りいただきありがとうございます！</h3>
+        <p>内容を確認のうえ、折り返しご連絡いたします。</p>
       </div>
-      <!--
-        準備できたら上の div を削除して下のコメントを解除：
-        <iframe
-          src="GOOGLE_FORM_EMBED_URL"
-          title="お問い合わせフォーム">
-        </iframe>
-      -->
+
     </div>
   </div>
 </section>
@@ -395,6 +490,48 @@
 <footer>
   <p>&copy; 2026 土田 龍. Built with Claude.</p>
 </footer>
+
+
+<script>
+/* ── Formspree Ajax 送信 ───────────────────────────────────────── */
+(function () {
+  var form      = document.getElementById('contact-form');
+  var thankyou  = document.getElementById('contact-thankyou');
+  if (!form) return;
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    var submitBtn = form.querySelector('[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.textContent = '送信中…';
+
+    var data = new FormData(form);
+
+    fetch(form.action, {
+      method: 'POST',
+      body: data,
+      headers: { 'Accept': 'application/json' }
+    })
+    .then(function (res) {
+      if (res.ok) {
+        /* 成功: フォームを隠してサンクスメッセージを表示 */
+        form.style.display = 'none';
+        thankyou.style.display = 'block';
+      } else {
+        return res.json().then(function (json) {
+          throw new Error(json.errors ? json.errors.map(function(e){ return e.message; }).join(', ') : '送信エラー');
+        });
+      }
+    })
+    .catch(function (err) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = '送信する →';
+      alert('送信に失敗しました。時間をおいて再度お試しください。\n(' + err.message + ')');
+    });
+  });
+})();
+</script>
 
 </body>
 </html>
