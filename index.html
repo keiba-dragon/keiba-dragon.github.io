@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>土田 龍 | Portfolio</title>
+<style>
+  :root {
+    --bg:       #080c08;
+    --bg2:      #0d130d;
+    --bg3:      #111a11;
+    --green:    #00e676;
+    --green2:   #00c853;
+    --green-dim:#1a4d2e;
+    --text:     #e8f5e9;
+    --muted:    #6a8f72;
+    --border:   #1e3a1e;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Hiragino Kaku Gothic Pro', Meiryo, 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 16px 40px;
+    background: rgba(8,12,8,0.85);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-size: 1.1em; font-weight: bold; color: var(--green);
+    letter-spacing: 0.1em; text-decoration: none;
+  }
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a {
+    color: var(--muted); text-decoration: none; font-size: 0.9em;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--green); }
+
+  /* ── HERO ── */
+  #hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    text-align: center;
+    padding: 80px 24px 40px;
+    position: relative; overflow: hidden;
+  }
+  #hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 60% 60% at 50% 40%, #0a2e1a 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-tag {
+    display: inline-block;
+    border: 1px solid var(--green2);
+    color: var(--green2);
+    font-size: 0.78em; letter-spacing: 0.15em;
+    padding: 4px 14px; border-radius: 20px;
+    margin-bottom: 24px;
+  }
+  #hero h1 {
+    font-size: clamp(2.4em, 6vw, 4em);
+    font-weight: 900;
+    line-height: 1.15;
+    margin-bottom: 16px;
+  }
+  #hero h1 .accent { color: var(--green); }
+  #hero .sub {
+    color: var(--muted); font-size: 1.05em;
+    max-width: 480px; margin: 0 auto 40px;
+  }
+  .btn {
+    display: inline-block;
+    background: transparent;
+    border: 2px solid var(--green);
+    color: var(--green);
+    padding: 12px 36px; border-radius: 4px;
+    text-decoration: none; font-size: 0.95em; font-weight: bold;
+    letter-spacing: 0.05em;
+    transition: background 0.2s, color 0.2s;
+  }
+  .btn:hover { background: var(--green); color: var(--bg); }
+  .btn-solid {
+    background: var(--green); color: var(--bg);
+  }
+  .btn-solid:hover { background: var(--green2); }
+
+  /* ── SECTIONS ── */
+  section { padding: 96px 24px; }
+  .section-inner { max-width: 860px; margin: 0 auto; }
+  .section-label {
+    font-size: 0.75em; letter-spacing: 0.2em;
+    color: var(--green); text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .section-title {
+    font-size: clamp(1.6em, 3.5vw, 2.2em);
+    font-weight: 800; margin-bottom: 48px;
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 16px;
+  }
+
+  /* ── ABOUT ── */
+  #about { background: var(--bg2); }
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.6fr;
+    gap: 48px; align-items: start;
+  }
+  .about-profile {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px 24px;
+    text-align: center;
+  }
+  .avatar {
+    width: 96px; height: 96px;
+    background: var(--green-dim);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.4em; margin: 0 auto 16px;
+    border: 2px solid var(--green);
+  }
+  .about-profile h2 { font-size: 1.3em; margin-bottom: 4px; }
+  .about-profile .role { color: var(--green); font-size: 0.85em; margin-bottom: 16px; }
+  .tag-list { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 16px; }
+  .tag {
+    background: var(--green-dim);
+    color: var(--green);
+    font-size: 0.75em; padding: 3px 10px; border-radius: 20px;
+    border: 1px solid var(--green2);
+  }
+  .about-text p { margin-bottom: 20px; color: #b0c4b1; }
+  .about-text p:last-child { margin-bottom: 0; }
+
+  /* ── SKILLS ── */
+  #skills { background: var(--bg); }
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+  }
+  .skill-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px 20px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .skill-card:hover { border-color: var(--green); transform: translateY(-4px); }
+  .skill-icon { font-size: 2em; margin-bottom: 12px; }
+  .skill-card h3 { font-size: 1em; font-weight: bold; color: var(--green); margin-bottom: 6px; }
+  .skill-card p { font-size: 0.82em; color: var(--muted); }
+
+  /* ── PROJECTS ── */
+  #projects { background: var(--bg2); }
+  .project-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px;
+    margin-bottom: 24px;
+    transition: border-color 0.2s;
+  }
+  .project-card:hover { border-color: var(--green); }
+  .project-header {
+    display: flex; justify-content: space-between;
+    align-items: flex-start; gap: 16px;
+    margin-bottom: 16px;
+  }
+  .project-title { font-size: 1.2em; font-weight: bold; color: var(--green); }
+  .project-badge {
+    font-size: 0.72em; padding: 3px 10px;
+    border-radius: 20px; border: 1px solid;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .badge-active { border-color: var(--green2); color: var(--green2); }
+  .project-desc { color: #b0c4b1; font-size: 0.92em; margin-bottom: 20px; }
+  .tech-list { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tech {
+    background: #0a1a0a; color: var(--muted);
+    font-size: 0.75em; padding: 3px 10px;
+    border-radius: 4px; border: 1px solid var(--border);
+  }
+  .project-links { margin-top: 20px; display: flex; gap: 12px; }
+  .project-links a {
+    font-size: 0.85em; color: var(--green);
+    text-decoration: none; border-bottom: 1px solid transparent;
+    transition: border-color 0.2s;
+  }
+  .project-links a:hover { border-color: var(--green); }
+
+  /* ── CONTACT ── */
+  #contact { background: var(--bg); }
+  .contact-wrap { text-align: center; }
+  .contact-wrap p { color: var(--muted); max-width: 480px; margin: 0 auto 40px; }
+  .contact-form-area {
+    max-width: 640px; margin: 0 auto;
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden;
+  }
+  .contact-form-area iframe {
+    width: 100%; border: none; display: block;
+    min-height: 600px;
+  }
+  .contact-fallback {
+    padding: 48px 32px; text-align: center;
+  }
+  .contact-fallback p { color: var(--muted); margin-bottom: 24px; font-size: 0.9em; }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    text-align: center;
+    padding: 32px 24px;
+    color: var(--muted);
+    font-size: 0.82em;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 680px) {
+    nav { padding: 14px 20px; }
+    .nav-links { gap: 20px; }
+    .about-grid { grid-template-columns: 1fr; }
+    section { padding: 64px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">RYU.DEV</a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <span class="hero-tag">AI × 競馬 × フリーランス</span>
+  <h1>土田 <span class="accent">龍</span></h1>
+  <p class="sub">Claude をフル活用して、アイデアをプロダクトに変えるエンジニア。</p>
+  <a class="btn" href="#projects">Projects を見る</a>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-inner">
+    <p class="section-label">About</p>
+    <h2 class="section-title">自己紹介</h2>
+    <div class="about-grid">
+      <div class="about-profile">
+        <div class="avatar">🐉</div>
+        <h2>土田 龍</h2>
+        <p class="role">AI Developer / Freelancer</p>
+        <div class="tag-list">
+          <span class="tag">Claude AI</span>
+          <span class="tag">Python</span>
+          <span class="tag">データ分析</span>
+          <span class="tag">競馬</span>
+        </div>
+      </div>
+      <div class="about-text">
+        <p>
+          Claude をはじめとする生成 AI を活用して、アイデアを素早くプロダクトに落とし込む開発者です。
+          「コードを書く」より「AI と一緒に作る」スタイルで、ツールの力を最大限に引き出すことが得意です。
+        </p>
+        <p>
+          趣味から始めた競馬の予測システム開発をきっかけに、機械学習・データパイプライン・Web 公開まで
+          一通り経験。現在はその経験を活かしてフリーランスとして活動予定。
+        </p>
+        <p>
+          「面白いと思ったことに全力を注ぐ」が信条。ご依頼・ご相談はお気軽にどうぞ。
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="section-inner">
+    <p class="section-label">Skills</p>
+    <h2 class="section-title">できること</h2>
+    <div class="skills-grid">
+      <div class="skill-card">
+        <div class="skill-icon">🤖</div>
+        <h3>Claude / AI 活用</h3>
+        <p>Claude Code・API を使ったツール開発、プロンプト設計、AI ワークフロー構築</p>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">🐍</div>
+        <h3>Python</h3>
+        <p>データ処理・スクレイピング・機械学習パイプラインの実装</p>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">📊</div>
+        <h3>データ分析</h3>
+        <p>pandas / LightGBM / 統計を使った予測モデル構築とレポート化</p>
+      </div>
+      <div class="skill-card">
+        <div class="skill-icon">🌐</div>
+        <h3>Web 公開</h3>
+        <p>静的サイト・GitHub Pages によるダッシュボード・ポートフォリオ公開</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="section-inner">
+    <p class="section-label">Projects</p>
+    <h2 class="section-title">プロジェクト</h2>
+
+    <div class="project-card">
+      <div class="project-header">
+        <span class="project-title">🏇 競馬AI 予測システム</span>
+        <span class="project-badge badge-active">稼働中</span>
+      </div>
+      <p class="project-desc">
+        JRA 全レースのデータを収集・加工し、LightGBM (LambdaMART) で馬券の期待値を予測するシステム。
+        データ取得から特徴量エンジニアリング・モデル学習・予測・ROI シミュレーションまでを
+        全自動パイプラインで実行。Claude を活用して開発速度を大幅に短縮した。
+      </p>
+      <div class="tech-list">
+        <span class="tech">Python</span>
+        <span class="tech">LightGBM</span>
+        <span class="tech">LambdaMART</span>
+        <span class="tech">pandas</span>
+        <span class="tech">JV-Link API</span>
+        <span class="tech">Claude AI</span>
+        <span class="tech">GitHub Pages</span>
+      </div>
+      <div class="project-links">
+        <a href="https://keiba-dragon.github.io" target="_blank" rel="noopener">→ 予測ダッシュボードを見る</a>
+      </div>
+    </div>
+
+    <!-- 追加プロジェクトはここにコピーして増やせます -->
+
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="section-inner contact-wrap">
+    <p class="section-label">Contact</p>
+    <h2 class="section-title" style="border:none;margin-bottom:16px;">お問い合わせ</h2>
+    <p>ご依頼・ご相談・お見積もりなど、お気軽にどうぞ。<br>通常 1〜2 営業日以内にご返信します。</p>
+
+    <div class="contact-form-area">
+      <!-- ↓↓↓ Google フォームの埋め込み URL に差し替えてください ↓↓↓ -->
+      <!-- 手順: Googleフォーム → 送信 → </> タブ → iframeのsrc=""の値をコピー -->
+      <div class="contact-fallback">
+        <p>⚠️ Googleフォームの埋め込みコードをここに設定してください。</p>
+        <p style="font-size:0.8em;color:#3a5a3a;">
+          Googleフォームを作成 → 「送信」→「&lt;/&gt;」→ iframeのsrcをコピーして<br>
+          このファイルの GOOGLE_FORM_EMBED_URL を置き換えてください。
+        </p>
+      </div>
+      <!--
+        準備できたら上の div を削除して下のコメントを解除：
+        <iframe
+          src="GOOGLE_FORM_EMBED_URL"
+          title="お問い合わせフォーム">
+        </iframe>
+      -->
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>&copy; 2026 土田 龍. Built with Claude.</p>
+</footer>
+
+</body>
+</html>
