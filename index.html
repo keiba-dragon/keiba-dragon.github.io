@@ -6,294 +6,242 @@
 <title>土田 龍 | Portfolio</title>
 <style>
   :root {
-    --bg:       #080c08;
-    --bg2:      #0d130d;
-    --bg3:      #111a11;
-    --green:    #00e676;
-    --green2:   #00c853;
-    --green-dim:#1a4d2e;
-    --text:     #e8f5e9;
-    --muted:    #6a8f72;
-    --border:   #1e3a1e;
+    --accent:  #2563eb;
+    --accent2: #1d4ed8;
+    --text:    #1e293b;
+    --muted:   #64748b;
+    --bg:      #ffffff;
+    --bg2:     #f8fafc;
+    --border:  #e2e8f0;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
   html { scroll-behavior: smooth; }
-
   body {
-    font-family: 'Hiragino Kaku Gothic Pro', Meiryo, 'Noto Sans JP', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    line-height: 1.7;
+    font-family: 'Hiragino Kaku Gothic Pro', 'Noto Sans JP', Meiryo, sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.7;
   }
 
   /* ── NAV ── */
   nav {
     position: fixed; top: 0; left: 0; right: 0; z-index: 100;
     display: flex; justify-content: space-between; align-items: center;
-    padding: 16px 40px;
-    background: rgba(8,12,8,0.85);
-    backdrop-filter: blur(10px);
+    padding: 0 40px; height: 60px;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(8px);
     border-bottom: 1px solid var(--border);
   }
-  .nav-logo {
-    font-size: 1.1em; font-weight: bold; color: var(--green);
-    letter-spacing: 0.1em; text-decoration: none;
-  }
-  .nav-links { display: flex; gap: 32px; list-style: none; }
-  .nav-links a {
-    color: var(--muted); text-decoration: none; font-size: 0.9em;
-    transition: color 0.2s;
-  }
-  .nav-links a:hover { color: var(--green); }
+  .nav-logo { font-weight: 800; font-size: 1.05em; color: var(--text); text-decoration: none; }
+  .nav-logo span { color: var(--accent); }
+  .nav-links { display: flex; gap: 28px; list-style: none; }
+  .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.9em; transition: color .2s; }
+  .nav-links a:hover { color: var(--accent); }
 
   /* ── HERO ── */
   #hero {
     min-height: 100vh;
     display: flex; flex-direction: column;
-    justify-content: center; align-items: center;
-    text-align: center;
-    padding: 80px 24px 40px;
-    position: relative; overflow: hidden;
+    justify-content: center; align-items: flex-start;
+    padding: 100px 10vw 60px;
+    background: linear-gradient(135deg, #eff6ff 0%, #ffffff 60%);
   }
-  #hero::before {
-    content: '';
-    position: absolute; inset: 0; z-index: 0;
-    background: radial-gradient(ellipse 80% 70% at 50% 50%, #0d3d20 0%, transparent 65%);
-    pointer-events: none;
-  }
-  .hero-tag {
+  .hero-label {
     display: inline-block;
-    background: rgba(0,200,83,0.12);
-    border: 1px solid var(--green2);
-    color: var(--green);
-    font-size: 0.82em; letter-spacing: 0.18em;
-    padding: 6px 18px; border-radius: 20px;
-    margin-bottom: 28px;
-    text-shadow: 0 0 12px rgba(0,230,118,0.5);
+    background: #dbeafe; color: var(--accent);
+    font-size: 0.8em; font-weight: 600; letter-spacing: 0.12em;
+    padding: 4px 14px; border-radius: 20px; margin-bottom: 24px;
   }
   #hero h1 {
-    font-size: clamp(2.8em, 7vw, 5em);
-    font-weight: 900;
-    line-height: 1.1;
-    margin-bottom: 20px;
-    color: #ffffff;
+    font-size: clamp(2.4em, 6vw, 4.2em);
+    font-weight: 900; line-height: 1.1; margin-bottom: 16px;
+    color: var(--text);
   }
-  #hero h1 .accent {
-    color: var(--green);
-    text-shadow: 0 0 24px rgba(0,230,118,0.7);
-  }
+  #hero h1 .accent { color: var(--accent); }
   #hero .sub {
-    color: #c8e6c9; font-size: 1.1em;
-    max-width: 480px; margin: 0 auto 44px;
+    font-size: 1.1em; color: var(--muted);
+    max-width: 480px; margin-bottom: 40px;
   }
   .btn {
     display: inline-block;
-    background: transparent;
-    border: 2px solid var(--green);
-    color: var(--green);
-    padding: 12px 36px; border-radius: 4px;
-    text-decoration: none; font-size: 0.95em; font-weight: bold;
-    letter-spacing: 0.05em;
-    transition: background 0.2s, color 0.2s;
+    background: var(--accent); color: #fff;
+    padding: 12px 32px; border-radius: 6px;
+    text-decoration: none; font-size: 0.95em; font-weight: 700;
+    transition: background .2s, transform .15s;
   }
-  .btn:hover { background: var(--green); color: var(--bg); }
-  .btn-solid {
-    background: var(--green); color: var(--bg);
+  .btn:hover { background: var(--accent2); transform: translateY(-1px); }
+  .btn-outline {
+    background: transparent; color: var(--accent);
+    border: 2px solid var(--accent); margin-left: 12px;
   }
-  .btn-solid:hover { background: var(--green2); }
+  .btn-outline:hover { background: #eff6ff; transform: translateY(-1px); }
 
-  /* ── SECTIONS ── */
-  section { padding: 96px 24px; }
+  /* ── SECTION COMMON ── */
+  section { padding: 88px 10vw; }
   .section-inner { max-width: 860px; margin: 0 auto; }
   .section-label {
-    font-size: 0.75em; letter-spacing: 0.2em;
-    color: var(--green); text-transform: uppercase;
-    margin-bottom: 8px;
+    font-size: 0.75em; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--accent); font-weight: 700; margin-bottom: 6px;
   }
   .section-title {
-    font-size: clamp(1.6em, 3.5vw, 2.2em);
-    font-weight: 800; margin-bottom: 48px;
+    font-size: clamp(1.5em, 3vw, 2em); font-weight: 800;
+    margin-bottom: 48px; padding-bottom: 14px;
     border-bottom: 2px solid var(--border);
-    padding-bottom: 16px;
   }
 
   /* ── ABOUT ── */
   #about { background: var(--bg2); }
   .about-grid {
-    display: grid;
-    grid-template-columns: 1fr 1.6fr;
+    display: grid; grid-template-columns: 220px 1fr;
     gap: 48px; align-items: start;
   }
   .about-profile {
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 32px 24px;
-    text-align: center;
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 12px; padding: 28px 20px; text-align: center;
   }
   .avatar {
-    width: 96px; height: 96px;
-    background: var(--green-dim);
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 2.4em; margin: 0 auto 16px;
-    border: 2px solid var(--green);
+    width: 80px; height: 80px; border-radius: 50%;
+    background: #dbeafe; display: flex; align-items: center;
+    justify-content: center; font-size: 2.2em;
+    margin: 0 auto 14px; border: 2px solid #bfdbfe;
   }
-  .about-profile h2 { font-size: 1.3em; margin-bottom: 4px; }
-  .about-profile .role { color: var(--green); font-size: 0.85em; margin-bottom: 16px; }
-  .tag-list { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 16px; }
+  .about-profile h2 { font-size: 1.15em; margin-bottom: 4px; }
+  .about-profile .role { color: var(--accent); font-size: 0.82em; margin-bottom: 14px; }
+  .tag-list { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
   .tag {
-    background: var(--green-dim);
-    color: var(--green);
-    font-size: 0.75em; padding: 3px 10px; border-radius: 20px;
-    border: 1px solid var(--green2);
+    background: #eff6ff; color: var(--accent);
+    font-size: 0.72em; padding: 3px 10px; border-radius: 20px;
+    border: 1px solid #bfdbfe;
   }
-  .about-text p { margin-bottom: 20px; color: #b0c4b1; }
+  .about-text p { color: var(--muted); margin-bottom: 16px; }
   .about-text p:last-child { margin-bottom: 0; }
 
   /* ── SKILLS ── */
   #skills { background: var(--bg); }
   .skills-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
     gap: 16px;
   }
   .skill-card {
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 24px 20px;
-    transition: border-color 0.2s, transform 0.2s;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 24px 20px;
+    transition: border-color .2s, box-shadow .2s, transform .2s;
   }
-  .skill-card:hover { border-color: var(--green); transform: translateY(-4px); }
-  .skill-icon { font-size: 2em; margin-bottom: 12px; }
-  .skill-card h3 { font-size: 1em; font-weight: bold; color: var(--green); margin-bottom: 6px; }
-  .skill-card p { font-size: 0.82em; color: var(--muted); }
+  .skill-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 4px 16px rgba(37,99,235,0.08);
+    transform: translateY(-3px);
+  }
+  .skill-icon { font-size: 1.8em; margin-bottom: 10px; }
+  .skill-card h3 { font-size: 0.95em; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+  .skill-card p { font-size: 0.8em; color: var(--muted); }
+
+  /* ── QUALIFICATIONS ── */
+  #qualifications { background: var(--bg2); }
+  .qual-list { display: flex; flex-direction: column; gap: 16px; }
+  .qual-item {
+    background: var(--bg); border: 1px solid var(--border);
+    border-left: 4px solid var(--accent);
+    border-radius: 8px; padding: 20px 24px;
+    display: flex; align-items: center; gap: 20px;
+  }
+  .qual-icon { font-size: 2em; flex-shrink: 0; }
+  .qual-name { font-size: 1.05em; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+  .qual-meta { font-size: 0.82em; color: var(--muted); }
+  .qual-badge {
+    margin-left: auto; flex-shrink: 0;
+    background: #dcfce7; color: #16a34a;
+    font-size: 0.75em; font-weight: 700;
+    padding: 3px 12px; border-radius: 20px;
+    border: 1px solid #bbf7d0;
+  }
 
   /* ── PROJECTS ── */
-  #projects { background: var(--bg2); }
+  #projects { background: var(--bg); }
   .project-card {
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 32px;
-    margin-bottom: 24px;
-    transition: border-color 0.2s;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 28px 32px; margin-bottom: 20px;
+    transition: border-color .2s, box-shadow .2s;
   }
-  .project-card:hover { border-color: var(--green); }
+  .project-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 4px 20px rgba(37,99,235,0.08);
+  }
   .project-header {
     display: flex; justify-content: space-between;
-    align-items: flex-start; gap: 16px;
-    margin-bottom: 16px;
+    align-items: flex-start; gap: 12px; margin-bottom: 12px;
   }
-  .project-title { font-size: 1.2em; font-weight: bold; color: var(--green); }
+  .project-title { font-size: 1.1em; font-weight: 800; color: var(--text); }
   .project-badge {
-    font-size: 0.72em; padding: 3px 10px;
-    border-radius: 20px; border: 1px solid;
+    font-size: 0.72em; font-weight: 700;
+    padding: 3px 12px; border-radius: 20px;
     white-space: nowrap; flex-shrink: 0;
+    background: #dcfce7; color: #16a34a; border: 1px solid #bbf7d0;
   }
-  .badge-active { border-color: var(--green2); color: var(--green2); }
-  .project-desc { color: #b0c4b1; font-size: 0.92em; margin-bottom: 20px; }
-  .tech-list { display: flex; flex-wrap: wrap; gap: 8px; }
+  .project-desc { color: var(--muted); font-size: 0.9em; margin-bottom: 18px; }
+  .tech-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
   .tech {
-    background: #0a1a0a; color: var(--muted);
+    background: #eff6ff; color: var(--accent);
     font-size: 0.75em; padding: 3px 10px;
-    border-radius: 4px; border: 1px solid var(--border);
+    border-radius: 4px; border: 1px solid #bfdbfe;
   }
-  .project-links { margin-top: 20px; display: flex; gap: 12px; }
+  .project-links { display: flex; flex-wrap: wrap; gap: 16px; }
   .project-links a {
-    font-size: 0.85em; color: var(--green);
-    text-decoration: none; border-bottom: 1px solid transparent;
-    transition: border-color 0.2s;
+    font-size: 0.85em; color: var(--accent); text-decoration: none;
+    font-weight: 600; border-bottom: 1px solid transparent;
+    transition: border-color .2s;
   }
-  .project-links a:hover { border-color: var(--green); }
+  .project-links a:hover { border-color: var(--accent); }
 
   /* ── CONTACT ── */
-  #contact { background: var(--bg); }
-  .contact-wrap { text-align: center; }
-  .contact-wrap p { color: var(--muted); max-width: 480px; margin: 0 auto 40px; }
+  #contact { background: var(--bg2); }
+  .contact-wrap { max-width: 560px; margin: 0 auto; text-align: center; }
+  .contact-wrap > p { color: var(--muted); margin-bottom: 36px; }
   .contact-form-area {
-    max-width: 640px; margin: 0 auto;
-    background: var(--bg3); border: 1px solid var(--border);
+    background: var(--bg); border: 1px solid var(--border);
     border-radius: 12px; overflow: hidden;
   }
-  .contact-form-area iframe {
-    width: 100%; border: none; display: block;
-    min-height: 600px;
-  }
-  /* ── CONTACT FORM ── */
-  .contact-form {
-    padding: 40px 40px 48px;
-    text-align: left;
-  }
-  .form-group {
-    margin-bottom: 20px;
-  }
+  .contact-form { padding: 36px 40px 44px; text-align: left; }
+  .form-group { margin-bottom: 18px; }
   .form-group label {
-    display: block;
-    font-size: 0.82em;
-    color: var(--muted);
-    letter-spacing: 0.08em;
-    margin-bottom: 6px;
+    display: block; font-size: 0.82em; font-weight: 600;
+    color: var(--muted); margin-bottom: 6px;
   }
   .form-group input,
   .form-group textarea {
-    width: 100%;
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    color: var(--text);
-    font-family: inherit;
-    font-size: 0.95em;
-    padding: 12px 16px;
-    transition: border-color 0.2s, box-shadow 0.2s;
-    outline: none;
-    resize: vertical;
+    width: 100%; background: var(--bg2);
+    border: 1px solid var(--border); border-radius: 6px;
+    color: var(--text); font-family: inherit; font-size: 0.95em;
+    padding: 10px 14px; outline: none; resize: vertical;
+    transition: border-color .2s, box-shadow .2s;
   }
   .form-group input:focus,
   .form-group textarea:focus {
-    border-color: var(--green);
-    box-shadow: 0 0 0 3px rgba(0, 230, 118, 0.12);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
   }
-  .form-group textarea { min-height: 140px; }
+  .form-group textarea { min-height: 130px; }
   .form-submit { margin-top: 8px; }
   .form-submit .btn { cursor: pointer; font-family: inherit; border: none; }
-  .form-thankyou {
-    display: none;
-    padding: 48px 32px;
-    text-align: center;
-  }
-  .form-thankyou .thankyou-icon {
-    font-size: 2.8em; margin-bottom: 16px;
-  }
-  .form-thankyou h3 {
-    font-size: 1.2em; color: var(--green); margin-bottom: 10px;
-  }
-  .form-thankyou p { color: var(--muted); font-size: 0.92em; }
-  /* honeypot: 非表示 */
+  .form-thankyou { display: none; padding: 48px 32px; text-align: center; }
+  .form-thankyou .thankyou-icon { font-size: 2.6em; margin-bottom: 14px; }
+  .form-thankyou h3 { font-size: 1.1em; font-weight: 700; margin-bottom: 8px; }
+  .form-thankyou p { color: var(--muted); font-size: 0.9em; }
   .form-honeypot { display: none !important; }
-  @media (max-width: 680px) {
-    .contact-form { padding: 28px 20px 36px; }
-  }
 
   /* ── FOOTER ── */
   footer {
-    background: var(--bg2);
-    border-top: 1px solid var(--border);
-    text-align: center;
-    padding: 32px 24px;
-    color: var(--muted);
-    font-size: 0.82em;
+    background: var(--text); color: #94a3b8;
+    text-align: center; padding: 28px 24px; font-size: 0.82em;
   }
 
   /* ── RESPONSIVE ── */
   @media (max-width: 680px) {
-    nav { padding: 14px 20px; }
-    .nav-links { gap: 20px; }
+    nav { padding: 0 20px; }
+    .nav-links { gap: 18px; }
+    section { padding: 64px 6vw; }
+    #hero { padding: 100px 6vw 48px; }
     .about-grid { grid-template-columns: 1fr; }
-    section { padding: 64px 20px; }
+    .contact-form { padding: 24px 20px 32px; }
   }
 </style>
 </head>
@@ -301,10 +249,11 @@
 
 <!-- NAV -->
 <nav>
-  <a class="nav-logo" href="#">RYU.DEV</a>
+  <a class="nav-logo" href="#">RYU<span>.</span>DEV</a>
   <ul class="nav-links">
     <li><a href="#about">About</a></li>
     <li><a href="#skills">Skills</a></li>
+    <li><a href="#qualifications">資格</a></li>
     <li><a href="#projects">Projects</a></li>
     <li><a href="#contact">Contact</a></li>
   </ul>
@@ -312,11 +261,12 @@
 
 <!-- HERO -->
 <section id="hero">
-  <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center">
-    <span class="hero-tag">AI × 競馬 × Claude</span>
-    <h1>土田 <span class="accent">龍</span></h1>
-    <p class="sub">Claude と遊びながら、面白いものを作っています。</p>
+  <span class="hero-label">AI × 競馬 × Claude</span>
+  <h1>土田 <span class="accent">龍</span></h1>
+  <p class="sub">Claude と一緒に、面白いものを作っています。</p>
+  <div>
     <a class="btn" href="#projects">Projects を見る</a>
+    <a class="btn btn-outline" href="#contact">Contact</a>
   </div>
 </section>
 
@@ -338,17 +288,9 @@
         </div>
       </div>
       <div class="about-text">
-        <p>
-          Claude と遊ぶのが好きな人間です。
-          「コードを書く」より「AI と一緒に作る」スタイルで動いています。
-        </p>
-        <p>
-          趣味で始めた競馬の予測システム開発をきっかけに、
-          機械学習・データパイプライン・Web 公開まで一通りやってみました。
-        </p>
-        <p>
-          面白いと思ったことに全力を注ぐのが信条。
-        </p>
+        <p>Claude と遊ぶのが好きな人間です。「コードを書く」より「AI と一緒に作る」スタイルで動いています。</p>
+        <p>趣味で始めた競馬の予測システム開発をきっかけに、機械学習・データパイプライン・Web 公開まで一通りやってみました。</p>
+        <p>面白いと思ったことに全力を注ぐのが信条。</p>
       </div>
     </div>
   </div>
@@ -373,12 +315,30 @@
       <div class="skill-card">
         <div class="skill-icon">📊</div>
         <h3>データ分析</h3>
-        <p>pandas / LightGBM / 統計を使った予測モデル構築とレポート化</p>
+        <p>pandas / 統計モデルを使った予測モデル構築とレポート化</p>
       </div>
       <div class="skill-card">
         <div class="skill-icon">🌐</div>
         <h3>Web 公開</h3>
         <p>静的サイト・GitHub Pages によるダッシュボード・ポートフォリオ公開</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- QUALIFICATIONS -->
+<section id="qualifications">
+  <div class="section-inner">
+    <p class="section-label">Qualifications</p>
+    <h2 class="section-title">資格・認定</h2>
+    <div class="qual-list">
+      <div class="qual-item">
+        <div class="qual-icon">📋</div>
+        <div>
+          <div class="qual-name">基本情報技術者試験</div>
+          <div class="qual-meta">IPA 情報処理推進機構 — 国家資格</div>
+        </div>
+        <span class="qual-badge">合格</span>
       </div>
     </div>
   </div>
@@ -393,12 +353,11 @@
     <div class="project-card">
       <div class="project-header">
         <span class="project-title">🏇 競馬AI 予測システム v2</span>
-        <span class="project-badge badge-active">稼働中</span>
+        <span class="project-badge">稼働中</span>
       </div>
       <p class="project-desc">
         JRA 全レースのデータを収集・加工し、条件付きロジットモデル（clogit）で馬券の期待値を予測するシステム。
-        5セグメント別モデル・isotonic calibration・特徴量自動選択を組み合わせ、
-        OOS ROI -10% 以上（全セグメント達成）を実現。Claude と共同開発。
+        5セグメント別モデル・isotonic calibration・特徴量自動選択を組み合わせ、OOS ROI -10% 以上（全セグメント達成）を実現。Claude と共同開発。
       </p>
       <div class="tech-list">
         <span class="tech">Python</span>
@@ -417,80 +376,49 @@
       </div>
     </div>
 
-    <!-- 追加プロジェクトはここにコピーして増やせます -->
-
   </div>
 </section>
 
 <!-- CONTACT -->
 <section id="contact">
-  <div class="section-inner contact-wrap">
+  <div class="section-inner">
     <p class="section-label">Contact</p>
     <h2 class="section-title" style="border:none;margin-bottom:16px;">お問い合わせ</h2>
-    <p>お気軽にどうぞ。</p>
-
-    <div class="contact-form-area">
-
-      <!-- お問い合わせフォーム (Formspree) -->
-      <!-- FORMSPREE_ENDPOINT: https://formspree.io/f/mdapybbp -->
-      <form
-        id="contact-form"
-        class="contact-form"
-        action="https://formspree.io/f/mdapybbp"
-        method="POST"
-        novalidate
-      >
-        <!-- honeypot スパム対策 -->
-        <div class="form-honeypot" aria-hidden="true">
-          <input type="text" name="_gotcha" tabindex="-1" autocomplete="off">
+    <div class="contact-wrap">
+      <p>お気軽にどうぞ。</p>
+      <div class="contact-form-area">
+        <form
+          id="contact-form"
+          class="contact-form"
+          action="https://formspree.io/f/mdapybbp"
+          method="POST"
+          novalidate
+        >
+          <div class="form-honeypot" aria-hidden="true">
+            <input type="text" name="_gotcha" tabindex="-1" autocomplete="off">
+          </div>
+          <div class="form-group">
+            <label for="cf-name">お名前 <span style="color:var(--accent)">*</span></label>
+            <input id="cf-name" type="text" name="name" placeholder="山田 太郎" required autocomplete="name">
+          </div>
+          <div class="form-group">
+            <label for="cf-email">メールアドレス <span style="color:var(--accent)">*</span></label>
+            <input id="cf-email" type="email" name="email" placeholder="your@email.com" required autocomplete="email">
+          </div>
+          <div class="form-group">
+            <label for="cf-message">メッセージ <span style="color:var(--accent)">*</span></label>
+            <textarea id="cf-message" name="message" placeholder="お問い合わせ内容をご記入ください。" required></textarea>
+          </div>
+          <div class="form-submit">
+            <button type="submit" class="btn">送信する →</button>
+          </div>
+        </form>
+        <div id="contact-thankyou" class="form-thankyou">
+          <div class="thankyou-icon">✅</div>
+          <h3>ありがとうございます！</h3>
+          <p>内容を確認のうえ、折り返しご連絡いたします。</p>
         </div>
-
-        <div class="form-group">
-          <label for="cf-name">お名前 <span style="color:var(--green)">*</span></label>
-          <input
-            id="cf-name"
-            type="text"
-            name="name"
-            placeholder="山田 太郎"
-            required
-            autocomplete="name"
-          >
-        </div>
-
-        <div class="form-group">
-          <label for="cf-email">メールアドレス <span style="color:var(--green)">*</span></label>
-          <input
-            id="cf-email"
-            type="email"
-            name="email"
-            placeholder="your@email.com"
-            required
-            autocomplete="email"
-          >
-        </div>
-
-        <div class="form-group">
-          <label for="cf-message">メッセージ <span style="color:var(--green)">*</span></label>
-          <textarea
-            id="cf-message"
-            name="message"
-            placeholder="お問い合わせ内容をご記入ください。"
-            required
-          ></textarea>
-        </div>
-
-        <div class="form-submit">
-          <button type="submit" class="btn btn-solid">送信する →</button>
-        </div>
-      </form>
-
-      <!-- 送信完了メッセージ -->
-      <div id="contact-thankyou" class="form-thankyou">
-        <div class="thankyou-icon">✅</div>
-        <h3>お送りいただきありがとうございます！</h3>
-        <p>内容を確認のうえ、折り返しご連絡いたします。</p>
       </div>
-
     </div>
   </div>
 </section>
@@ -500,43 +428,30 @@
   <p>&copy; 2026 土田 龍. Built with Claude.</p>
 </footer>
 
-
 <script>
-/* ── Formspree Ajax 送信 ───────────────────────────────────────── */
 (function () {
-  var form      = document.getElementById('contact-form');
-  var thankyou  = document.getElementById('contact-thankyou');
+  var form     = document.getElementById('contact-form');
+  var thankyou = document.getElementById('contact-thankyou');
   if (!form) return;
-
   form.addEventListener('submit', function (e) {
     e.preventDefault();
-
-    var submitBtn = form.querySelector('[type="submit"]');
-    submitBtn.disabled = true;
-    submitBtn.textContent = '送信中…';
-
-    var data = new FormData(form);
-
+    var btn = form.querySelector('[type="submit"]');
+    btn.disabled = true; btn.textContent = '送信中…';
     fetch(form.action, {
-      method: 'POST',
-      body: data,
+      method: 'POST', body: new FormData(form),
       headers: { 'Accept': 'application/json' }
-    })
-    .then(function (res) {
+    }).then(function (res) {
       if (res.ok) {
-        /* 成功: フォームを隠してサンクスメッセージを表示 */
         form.style.display = 'none';
         thankyou.style.display = 'block';
       } else {
-        return res.json().then(function (json) {
-          throw new Error(json.errors ? json.errors.map(function(e){ return e.message; }).join(', ') : '送信エラー');
+        return res.json().then(function (j) {
+          throw new Error(j.errors ? j.errors.map(function(e){return e.message}).join(', ') : '送信エラー');
         });
       }
-    })
-    .catch(function (err) {
-      submitBtn.disabled = false;
-      submitBtn.textContent = '送信する →';
-      alert('送信に失敗しました。時間をおいて再度お試しください。\n(' + err.message + ')');
+    }).catch(function (err) {
+      btn.disabled = false; btn.textContent = '送信する →';
+      alert('送信に失敗しました。\n(' + err.message + ')');
     });
   });
 })();
