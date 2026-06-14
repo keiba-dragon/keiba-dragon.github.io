@@ -1,0 +1,380 @@
+:root {
+  --accent:     #2563eb;
+  --accent2:    #1d4ed8;
+  --text:       #1e293b;
+  --muted:      #64748b;
+  --bg:         #ffffff;
+  --bg2:        #f8fafc;
+  --border:     #e2e8f0;
+  --visited-bg: #dbeafe;
+  --cell-w:     72px;
+  --cell-h:     46px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Hiragino Kaku Gothic Pro', 'Noto Sans JP', Meiryo, sans-serif;
+  background: var(--bg2);
+  color: var(--text);
+}
+
+/* ── NAV ── */
+nav {
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 24px;
+  height: 56px;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+}
+.nav-back {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.86em;
+  transition: color .2s;
+}
+.nav-back:hover { color: var(--accent); }
+.nav-sep { color: var(--border); }
+.nav-title { font-weight: 800; font-size: 1em; color: var(--text); }
+
+/* ── HEADER ── */
+.header {
+  background: linear-gradient(135deg, #eff6ff 0%, #fff 60%);
+  border-bottom: 1px solid var(--border);
+  padding: 28px 24px 20px;
+}
+.header h1 { font-size: 1.4em; font-weight: 900; margin-bottom: 8px; }
+.stats {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+.stat-count { font-size: 1.5em; font-weight: 900; color: var(--accent); }
+.stat-label { font-size: 0.82em; color: var(--muted); }
+.progress-bar {
+  flex: 1;
+  min-width: 160px;
+  max-width: 300px;
+  height: 8px;
+  background: var(--border);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 99px;
+  transition: width .4s;
+}
+.legend {
+  display: flex;
+  gap: 16px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78em;
+  color: var(--muted);
+}
+.legend-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+}
+.legend-dot.unvisited { background: #f1f5f9; border: 1.5px solid var(--border); }
+.legend-dot.visited   { background: var(--visited-bg); border: 1.5px solid #93c5fd; }
+
+/* ── APP BODY ── */
+.app-body {
+  display: flex;
+  height: calc(100vh - 56px - 130px);
+  overflow: hidden;
+}
+
+/* ── MAP ── */
+.map-wrap {
+  flex: 1;
+  overflow: auto;
+  padding: 24px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+.map-grid {
+  display: grid;
+  grid-template-columns: repeat(11, var(--cell-w));
+  grid-template-rows: repeat(15, var(--cell-h));
+  gap: 3px;
+  position: relative;
+}
+
+/* ── CELLS ── */
+.cell {
+  border-radius: 6px;
+  border: 1.5px solid var(--border);
+  background: #f1f5f9;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+  transition: background .2s, border-color .2s, transform .1s, box-shadow .2s;
+  line-height: 1.3;
+  padding: 2px;
+  position: relative;
+}
+.cell:hover {
+  border-color: var(--accent);
+  box-shadow: 0 2px 8px rgba(37,99,235,0.18);
+  transform: scale(1.06);
+  z-index: 10;
+}
+.cell.visited {
+  background: var(--visited-bg);
+  border-color: #93c5fd;
+  color: #1d4ed8;
+  font-weight: 700;
+}
+.cell.visited::after {
+  content: '✓';
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  font-size: 9px;
+  color: var(--accent);
+}
+.cell.active {
+  background: var(--accent);
+  border-color: var(--accent2);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(37,99,235,0.35);
+  transform: scale(1.06);
+  z-index: 10;
+}
+.cell.active::after { color: rgba(255,255,255,0.8); }
+
+/* region accent (left border) */
+.cell[data-region='北海道'] { border-left-color: #818cf8; }
+.cell[data-region='東北']   { border-left-color: #34d399; }
+.cell[data-region='関東']   { border-left-color: #f472b6; }
+.cell[data-region='中部']   { border-left-color: #fb923c; }
+.cell[data-region='近畿']   { border-left-color: #a78bfa; }
+.cell[data-region='中国']   { border-left-color: #2dd4bf; }
+.cell[data-region='四国']   { border-left-color: #facc15; }
+.cell[data-region='九州']   { border-left-color: #f87171; }
+.cell[data-region='沖縄']   { border-left-color: #38bdf8; }
+
+/* ── SIDE PANEL ── */
+.panel {
+  width: 340px;
+  flex-shrink: 0;
+  background: var(--bg);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  transition: transform .25s;
+  overflow: hidden;
+}
+.panel.hidden {
+  transform: translateX(340px);
+  width: 0;
+  border: none;
+}
+.panel-header {
+  padding: 20px 20px 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.panel-header h2 { font-size: 1.2em; font-weight: 800; }
+.panel-region { font-size: 0.75em; color: var(--muted); font-weight: 600; margin-top: 2px; }
+.panel-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2em;
+  color: var(--muted);
+  padding: 4px 6px;
+  border-radius: 4px;
+  transition: background .2s;
+}
+.panel-close:hover { background: var(--bg2); }
+.panel-body { flex: 1; overflow-y: auto; padding: 20px; }
+.panel-empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 0.9em;
+  text-align: center;
+  padding: 48px 20px;
+}
+.panel-empty-icon { font-size: 2.4em; }
+
+/* ── FORM ── */
+.form-group { margin-bottom: 18px; }
+.form-group label {
+  display: block;
+  font-size: 0.78em;
+  font-weight: 700;
+  color: var(--muted);
+  margin-bottom: 6px;
+  letter-spacing: 0.04em;
+}
+.form-group input[type="date"],
+.form-group textarea {
+  width: 100%;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.9em;
+  padding: 9px 12px;
+  outline: none;
+  transition: border-color .2s, box-shadow .2s;
+}
+.form-group input[type="date"]:focus,
+.form-group textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+}
+.form-group textarea { resize: vertical; min-height: 80px; }
+
+/* ── PHOTOS ── */
+.photos-list { display: flex; flex-direction: column; gap: 8px; }
+.photo-row   { display: flex; gap: 6px; align-items: center; }
+.photo-row input {
+  flex: 1;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.82em;
+  padding: 7px 10px;
+  outline: none;
+  transition: border-color .2s;
+}
+.photo-row input:focus { border-color: var(--accent); }
+.photo-row input::placeholder { color: #cbd5e1; }
+.btn-icon {
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg2);
+  cursor: pointer;
+  font-size: 1em;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .2s, color .2s, border-color .2s;
+}
+.btn-icon:hover         { background: #fee2e2; color: #ef4444; border-color: #fca5a5; }
+.btn-icon.add           { color: var(--accent); }
+.btn-icon.add:hover     { background: var(--visited-bg); color: #1d4ed8; border-color: #93c5fd; }
+.add-photo-row          { margin-top: 6px; }
+.photo-preview          { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.photo-thumb {
+  width: 72px;
+  height: 72px;
+  border-radius: 6px;
+  object-fit: cover;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: opacity .2s;
+}
+.photo-thumb:hover { opacity: .8; }
+
+/* ── PANEL FOOTER ── */
+.panel-footer {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 8px;
+}
+.btn {
+  flex: 1;
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 0.88em;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background .2s, transform .1s;
+  border: none;
+}
+.btn:hover { transform: translateY(-1px); }
+.btn-save   { background: var(--accent); color: #fff; }
+.btn-save:hover { background: var(--accent2); }
+.btn-delete {
+  background: var(--bg2);
+  color: #ef4444;
+  border: 1px solid #fca5a5;
+  flex: 0 0 auto;
+  width: 40px;
+  padding: 0;
+}
+.btn-delete:hover { background: #fee2e2; }
+
+/* ── PHOTO MODAL ── */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0,0,0,0.85);
+  align-items: center;
+  justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+.modal-overlay img  { max-width: 90vw; max-height: 90vh; border-radius: 8px; }
+.modal-close {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 2em;
+  cursor: pointer;
+  line-height: 1;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 700px) {
+  :root { --cell-w: 52px; --cell-h: 36px; }
+  .cell { font-size: 10px; }
+  .panel {
+    position: fixed;
+    top: 0; right: 0; bottom: 0;
+    width: 100%;
+    max-width: 100%;
+    z-index: 300;
+  }
+  .panel.hidden { transform: translateX(100%); }
+  .app-body { height: auto; flex-direction: column; overflow: visible; }
+  .map-wrap  { padding: 12px; }
+}
