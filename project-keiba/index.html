@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>競馬AI 予測システム v2 | 土田 龍</title>
+<style>
+  :root {
+    --accent:  #2563eb;
+    --accent2: #1d4ed8;
+    --text:    #1e293b;
+    --muted:   #64748b;
+    --bg:      #ffffff;
+    --bg2:     #f8fafc;
+    --border:  #e2e8f0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Hiragino Kaku Gothic Pro', 'Noto Sans JP', Meiryo, sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.75;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; gap: 20px;
+    padding: 0 40px; height: 60px;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-back {
+    color: var(--muted); text-decoration: none; font-size: 0.88em;
+    display: flex; align-items: center; gap: 4px;
+    transition: color .2s;
+  }
+  .nav-back:hover { color: var(--accent); }
+  .nav-title { font-size: 0.92em; font-weight: 700; color: var(--text); }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 100px 10vw 60px;
+    background: linear-gradient(135deg, #eff6ff 0%, #ffffff 60%);
+    border-bottom: 1px solid var(--border);
+  }
+  .hero-label {
+    display: inline-block;
+    background: #dbeafe; color: var(--accent);
+    font-size: 0.78em; font-weight: 600; letter-spacing: 0.12em;
+    padding: 4px 14px; border-radius: 20px; margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-size: clamp(1.8em, 4vw, 2.8em);
+    font-weight: 900; line-height: 1.2; margin-bottom: 14px;
+  }
+  .hero .sub { font-size: 1em; color: var(--muted); max-width: 600px; margin-bottom: 32px; }
+  .hero-links { display: flex; flex-wrap: wrap; gap: 12px; }
+  .btn {
+    display: inline-block;
+    background: var(--accent); color: #fff;
+    padding: 10px 24px; border-radius: 6px;
+    text-decoration: none; font-size: 0.88em; font-weight: 700;
+    transition: background .2s, transform .15s;
+  }
+  .btn:hover { background: var(--accent2); transform: translateY(-1px); }
+  .btn-outline {
+    background: transparent; color: var(--accent);
+    border: 2px solid var(--accent);
+  }
+  .btn-outline:hover { background: #eff6ff; transform: translateY(-1px); }
+
+  /* ── MAIN LAYOUT ── */
+  .content { max-width: 860px; margin: 0 auto; padding: 64px 10vw 96px; }
+
+  /* ── SECTION ── */
+  .sec { margin-bottom: 72px; }
+  .sec-label {
+    font-size: 0.72em; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--accent); font-weight: 700; margin-bottom: 6px;
+  }
+  .sec-title {
+    font-size: 1.4em; font-weight: 800; margin-bottom: 24px;
+    padding-bottom: 12px; border-bottom: 2px solid var(--border);
+  }
+  .sec p { color: var(--muted); margin-bottom: 14px; }
+  .sec p:last-child { margin-bottom: 0; }
+
+  /* ── PIPELINE ── */
+  .pipeline { display: flex; flex-direction: column; gap: 0; }
+  .pipe-step {
+    display: flex; align-items: flex-start; gap: 16px;
+    position: relative;
+  }
+  .pipe-step:not(:last-child)::after {
+    content: '';
+    position: absolute; left: 19px; top: 44px;
+    width: 2px; height: calc(100% - 8px);
+    background: var(--border);
+  }
+  .pipe-dot {
+    width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+    background: #dbeafe; border: 2px solid #93c5fd;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1em; z-index: 1;
+  }
+  .pipe-body { padding: 8px 0 32px; flex: 1; }
+  .pipe-name { font-size: 0.95em; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .pipe-desc { font-size: 0.85em; color: var(--muted); }
+  .pipe-sub {
+    margin-top: 8px; padding: 10px 14px;
+    background: var(--bg2); border-left: 3px solid #93c5fd;
+    border-radius: 0 6px 6px 0; font-size: 0.82em; color: var(--muted);
+  }
+  .pipe-sub li { margin-bottom: 3px; list-style: none; padding-left: 0; }
+  .pipe-sub li::before { content: '・'; }
+
+  /* ── MODEL CARDS ── */
+  .model-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .model-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 18px 20px;
+  }
+  .model-card h4 { font-size: 0.85em; font-weight: 700; color: var(--accent); margin-bottom: 6px; }
+  .model-card p { font-size: 0.82em; color: var(--muted); margin: 0; }
+
+  /* ── TABLE ── */
+  .styled-table {
+    width: 100%; border-collapse: collapse; font-size: 0.9em;
+  }
+  .styled-table th {
+    background: #eff6ff; color: var(--accent);
+    font-size: 0.8em; font-weight: 700; letter-spacing: 0.06em;
+    padding: 10px 16px; text-align: left;
+    border-bottom: 2px solid #bfdbfe;
+  }
+  .styled-table td {
+    padding: 12px 16px; border-bottom: 1px solid var(--border);
+    color: var(--text); vertical-align: middle;
+  }
+  .styled-table tr:last-child td { border-bottom: none; }
+  .styled-table tr:hover td { background: #f8fafc; }
+
+  /* ── TECH CHIPS ── */
+  .tech-list { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tech {
+    background: #eff6ff; color: var(--accent);
+    font-size: 0.78em; font-weight: 600;
+    padding: 4px 12px; border-radius: 4px;
+    border: 1px solid #bfdbfe;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 680px) {
+    nav { padding: 0 20px; }
+    .hero { padding: 88px 6vw 40px; }
+    .content { padding: 48px 6vw 72px; }
+    .model-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-back" href="/">← ポートフォリオに戻る</a>
+  <span style="color:var(--border)">|</span>
+  <span class="nav-title">🏇 競馬AI 予測システム v2</span>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <span class="hero-label">Project</span>
+  <h1>🏇 競馬AI 予測システム v2</h1>
+  <p class="sub">
+    JRA 全レースを対象に、AIスコア1位の馬を全買いし続ける単勝 ROI のプラス化を目指して構築した予測システム。
+    データ取得から特徴量生成・モデル学習・毎日の新聞公開まで全自動で動いています。
+  </p>
+  <div class="hero-links">
+    <a class="btn" href="https://keiba-dragon.github.io/horse_racing_ai_v2/" target="_blank" rel="noopener">→ 予測新聞を見る</a>
+    <a class="btn btn-outline" href="https://keiba-dragon.github.io/horse_racing_ai_v2/model_report_20260613.html" target="_blank" rel="noopener">→ モデルレポート</a>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+
+  <!-- 目的 -->
+  <div class="sec">
+    <p class="sec-label">Background</p>
+    <h2 class="sec-title">目的</h2>
+    <p>
+      JRA の単勝控除率は約 20%。ランダムに馬を選び続けると期待 ROI は -20% になる。
+      このプロジェクトでは「AIがスコア1位と判断した馬を全レースで買い続ける」という
+      シンプルな条件のもと、機械学習で -20% から回復させることを目標としています。
+    </p>
+    <p>
+      特定のレースを恣意的に選ぶ余地を残さず、システムが出す答えをそのまま受け入れるルールにすることで、
+      バックテストの過剰適合を避け、真の汎化性能を測っています。
+    </p>
+  </div>
+
+  <!-- データパイプライン -->
+  <div class="sec">
+    <p class="sec-label">Data Pipeline</p>
+    <h2 class="sec-title">データパイプライン</h2>
+    <div class="pipeline">
+
+      <div class="pipe-step">
+        <div class="pipe-dot">📡</div>
+        <div class="pipe-body">
+          <div class="pipe-name">JVLink API — 生データ取得</div>
+          <div class="pipe-desc">JRA 公式データ配信サービス（COM 経由）から 2013 年以降の全件を取得。</div>
+          <ul class="pipe-sub">
+            <li>成績データ（着順・タイム・上がり3F・コーナー通過順）</li>
+            <li>血統データ（種牡馬・母父馬）</li>
+            <li>騎手・調教師 成績履歴</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="pipe-step">
+        <div class="pipe-dot">⚙️</div>
+        <div class="pipe-body">
+          <div class="pipe-name">01_make_features.py — 特徴量エンジニアリング</div>
+          <div class="pipe-desc">生データから 491 列の特徴量を生成。リーク防止のため当該レースを shift(1) で除外。</div>
+          <ul class="pipe-sub">
+            <li>前走・近5走・近10走の成績集計</li>
+            <li>騎手×コース・種牡馬×馬場 等のローリング統計</li>
+            <li>タイム指数・クラス調整着順・脚質分類</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="pipe-step">
+        <div class="pipe-dot">🗄️</div>
+        <div class="pipe-body">
+          <div class="pipe-name">all_venues_features.parquet</div>
+          <div class="pipe-desc">65 万行 × 491 列の学習用データセット（2013〜現在）。</div>
+        </div>
+      </div>
+
+      <div class="pipe-step">
+        <div class="pipe-dot">🔮</div>
+        <div class="pipe-body">
+          <div class="pipe-name">06_predict_from_card.py — 当日予測</div>
+          <div class="pipe-desc">当日の出馬表を JVLink API で取得し、過去データと照合して特徴量を生成。5セグメント別モデルで単勝確率を推定。</div>
+        </div>
+      </div>
+
+      <div class="pipe-step">
+        <div class="pipe-dot">📰</div>
+        <div class="pipe-body">
+          <div class="pipe-name">make_newspaper.py — 新聞生成・公開</div>
+          <div class="pipe-desc">スクレイピングでライブオッズ・馬体重を取得し、期待値フィルタで買い目を絞り込んだ HTML を自動生成 → GitHub Pages 公開。</div>
+          <ul class="pipe-sub">
+            <li>netkeiba からライブオッズ・馬体重をスクレイピング</li>
+            <li>EV（期待値）フィルタで買い目を絞り込み</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- モデル設計 -->
+  <div class="sec">
+    <p class="sec-label">Model</p>
+    <h2 class="sec-title">モデル設計</h2>
+    <div class="model-grid">
+      <div class="model-card">
+        <h4>アーキテクチャ</h4>
+        <p>条件付きロジット（Conditional Logit）+ Isotonic Calibration。レース内での相対確率を直接モデル化。</p>
+      </div>
+      <div class="model-card">
+        <h4>最適化</h4>
+        <p>Adam optimizer、Early stopping（validation NLL）、L2 正則化（λ = 0.006）。</p>
+      </div>
+      <div class="model-card">
+        <h4>特徴選択</h4>
+        <p>ランダムサーチ（add / remove / swap）による greedy selection。最低 10 特徴を強制選択。</p>
+      </div>
+      <div class="model-card">
+        <h4>評価指標</h4>
+        <p>2023-24 と 2025 の合算的中率（2325 スコア）で特徴を選択。単年 ±30% キャップ付き。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5セグメント -->
+  <div class="sec">
+    <p class="sec-label">Segments</p>
+    <h2 class="sec-title">5セグメント構成</h2>
+    <p style="margin-bottom:20px;">
+      コースと距離でレースを5分割し、セグメントごとに独立したモデルを学習。
+      それぞれの特性に合った特徴量が自動選択されます。
+    </p>
+    <table class="styled-table">
+      <thead>
+        <tr>
+          <th>セグメント</th>
+          <th>条件</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>ダート長距離</td><td>ダート・1400m 超</td></tr>
+        <tr><td>ダート短距離</td><td>ダート・1400m 以下</td></tr>
+        <tr><td>芝短距離</td><td>芝・1400m 以下</td></tr>
+        <tr><td>芝中距離</td><td>芝・1401〜2000m</td></tr>
+        <tr><td>芝長距離</td><td>芝・2000m 超</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 技術スタック -->
+  <div class="sec">
+    <p class="sec-label">Tech Stack</p>
+    <h2 class="sec-title">技術スタック</h2>
+    <div class="tech-list">
+      <span class="tech">Python 3.x</span>
+      <span class="tech">NumPy</span>
+      <span class="tech">Pandas</span>
+      <span class="tech">scikit-learn</span>
+      <span class="tech">PyArrow</span>
+      <span class="tech">JVLink API（COM）</span>
+      <span class="tech">requests</span>
+      <span class="tech">BeautifulSoup</span>
+      <span class="tech">GitHub Pages</span>
+      <span class="tech">Google Drive</span>
+      <span class="tech">Claude AI</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer style="background:#1e293b;color:#64748b;text-align:center;padding:28px 24px;font-size:0.82em;">
+  <p>&copy; 2026 土田 龍. Built with Claude.</p>
+</footer>
+
+</body>
+</html>
