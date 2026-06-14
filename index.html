@@ -392,26 +392,27 @@
 
     <div class="project-card">
       <div class="project-header">
-        <span class="project-title">🏇 競馬AI 予測システム</span>
+        <span class="project-title">🏇 競馬AI 予測システム v2</span>
         <span class="project-badge badge-active">稼働中</span>
       </div>
       <p class="project-desc">
-        JRA 全レースのデータを収集・加工し、LightGBM (LambdaMART) で馬券の期待値を予測するシステム。
-        データ取得から特徴量エンジニアリング・モデル学習・予測・ROI シミュレーションまでを
-        全自動パイプラインで実行。Claude を活用して開発速度を大幅に短縮した。
+        JRA 全レースのデータを収集・加工し、条件付きロジットモデル（clogit）で馬券の期待値を予測するシステム。
+        5セグメント別モデル・isotonic calibration・特徴量自動選択を組み合わせ、
+        OOS ROI -10% 以上（全セグメント達成）を実現。Claude と共同開発。
       </p>
       <div class="tech-list">
         <span class="tech">Python</span>
-        <span class="tech">LightGBM</span>
-        <span class="tech">LambdaMART</span>
+        <span class="tech">条件付きロジット</span>
         <span class="tech">pandas</span>
         <span class="tech">JV-Link API</span>
         <span class="tech">Claude AI</span>
         <span class="tech">GitHub Pages</span>
       </div>
       <div class="project-links">
-        <a href="https://keiba-dragon.github.io/horse_racing_ai/daily_roi_2026.html" target="_blank" rel="noopener">→ 予測ROI（最終オッズ）</a>
-        <a href="https://keiba-dragon.github.io/horse_racing_ai/predict_time_roi_2026.html" target="_blank" rel="noopener">→ 予測ROI（予想時点）</a>
+        <a href="https://keiba-dragon.github.io/horse_racing_ai_v2/" target="_blank" rel="noopener">→ トップ</a>
+        <a href="https://keiba-dragon.github.io/horse_racing_ai_v2/newspaper_20260614.html" target="_blank" rel="noopener">→ 本日の新聞</a>
+        <a href="https://keiba-dragon.github.io/horse_racing_ai_v2/model_report_20260613.html" target="_blank" rel="noopener">→ モデルレポート</a>
+        <a href="https://keiba-dragon.github.io/horse_racing_ai_v2/accuracy_model_report_20260613.html" target="_blank" rel="noopener">→ 的中率レポート</a>
       </div>
     </div>
 
