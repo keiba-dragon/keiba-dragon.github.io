@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>旅行マップ | 土田 龍</title>
+<style>
+  :root {
+    --accent:  #2563eb;
+    --accent2: #1d4ed8;
+    --visited: #3b82f6;
+    --visited-bg: #dbeafe;
+    --text:    #1e293b;
+    --muted:   #64748b;
+    --bg:      #ffffff;
+    --bg2:     #f8fafc;
+    --border:  #e2e8f0;
+    --cell-w:  72px;
+    --cell-h:  46px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Hiragino Kaku Gothic Pro', 'Noto Sans JP', Meiryo, sans-serif;
+    background: var(--bg2); color: var(--text);
+  }
+
+  /* ── NAV ── */
+  nav {
+    background: rgba(255,255,255,0.92); backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 16px;
+    padding: 0 24px; height: 56px; position: sticky; top: 0; z-index: 200;
+  }
+  .nav-back { color: var(--muted); text-decoration: none; font-size: 0.86em; transition: color .2s; }
+  .nav-back:hover { color: var(--accent); }
+  .nav-title { font-weight: 800; font-size: 1em; color: var(--text); }
+
+  /* ── HEADER ── */
+  .header {
+    background: linear-gradient(135deg, #eff6ff 0%, #fff 60%);
+    border-bottom: 1px solid var(--border);
+    padding: 28px 24px 20px;
+  }
+  .header h1 { font-size: 1.4em; font-weight: 900; margin-bottom: 6px; }
+  .stats { display: flex; align-items: center; gap: 16px; margin-top: 10px; flex-wrap: wrap; }
+  .stat-count { font-size: 1.5em; font-weight: 900; color: var(--accent); }
+  .stat-label { font-size: 0.82em; color: var(--muted); }
+  .progress-bar {
+    flex: 1; min-width: 160px; max-width: 300px;
+    height: 8px; background: var(--border); border-radius: 99px; overflow: hidden;
+  }
+  .progress-fill { height: 100%; background: var(--accent); border-radius: 99px; transition: width .4s; }
+  .legend { display: flex; gap: 16px; margin-top: 8px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.78em; color: var(--muted); }
+  .legend-dot { width: 14px; height: 14px; border-radius: 3px; }
+
+  /* ── LAYOUT ── */
+  .app-body {
+    display: flex; height: calc(100vh - 56px - 120px);
+    overflow: hidden;
+  }
+
+  /* ── MAP ── */
+  .map-wrap {
+    flex: 1; overflow: auto; padding: 24px;
+    display: flex; align-items: flex-start; justify-content: flex-start;
+  }
+  .map-grid {
+    display: grid;
+    grid-template-columns: repeat(11, var(--cell-w));
+    grid-template-rows: repeat(15, var(--cell-h));
+    gap: 3px;
+    position: relative;
+  }
+  .cell {
+    border-radius: 6px; border: 1.5px solid var(--border);
+    background: #f1f5f9; color: var(--muted);
+    font-size: 12px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    text-align: center; cursor: pointer; user-select: none;
+    transition: background .2s, border-color .2s, transform .1s, box-shadow .2s;
+    line-height: 1.3; padding: 2px;
+    position: relative;
+  }
+  .cell:hover {
+    border-color: var(--accent);
+    box-shadow: 0 2px 8px rgba(37,99,235,0.18);
+    transform: scale(1.06); z-index: 10;
+  }
+  .cell.visited {
+    background: var(--visited-bg);
+    border-color: #93c5fd;
+    color: var(--accent2);
+    font-weight: 700;
+  }
+  .cell.visited::after {
+    content: '✓';
+    position: absolute; top: 2px; right: 4px;
+    font-size: 9px; color: var(--accent);
+  }
+  .cell.active {
+    background: var(--accent);
+    border-color: var(--accent2);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(37,99,235,0.35);
+    transform: scale(1.06); z-index: 10;
+  }
+  .cell.active::after { color: #fff; }
+
+  /* region colors (subtle left border) */
+  .cell[data-region='北海道'] { border-left-color: #818cf8; }
+  .cell[data-region='東北']   { border-left-color: #34d399; }
+  .cell[data-region='関東']   { border-left-color: #f472b6; }
+  .cell[data-region='中部']   { border-left-color: #fb923c; }
+  .cell[data-region='近畿']   { border-left-color: #a78bfa; }
+  .cell[data-region='中国']   { border-left-color: #2dd4bf; }
+  .cell[data-region='四国']   { border-left-color: #facc15; }
+  .cell[data-region='九州']   { border-left-color: #f87171; }
+  .cell[data-region='沖縄']   { border-left-color: #38bdf8; }
+
+  /* ── SIDE PANEL ── */
+  .panel {
+    width: 340px; flex-shrink: 0;
+    background: var(--bg); border-left: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    transition: transform .25s;
+    overflow: hidden;
+  }
+  .panel.hidden { transform: translateX(340px); width: 0; border: none; }
+  .panel-header {
+    padding: 20px 20px 14px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .panel-header h2 { font-size: 1.2em; font-weight: 800; }
+  .panel-region { font-size: 0.75em; color: var(--muted); font-weight: 600; }
+  .panel-close {
+    background: none; border: none; cursor: pointer;
+    font-size: 1.2em; color: var(--muted); padding: 4px;
+    border-radius: 4px; transition: background .2s;
+  }
+  .panel-close:hover { background: var(--bg2); }
+  .panel-body { flex: 1; overflow-y: auto; padding: 20px; }
+  .panel-empty {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 8px; color: var(--muted); font-size: 0.9em;
+    text-align: center; padding: 40px 20px;
+  }
+  .panel-empty-icon { font-size: 2.4em; }
+  .form-group { margin-bottom: 18px; }
+  .form-group label {
+    display: block; font-size: 0.78em; font-weight: 700;
+    color: var(--muted); margin-bottom: 6px; letter-spacing: 0.04em;
+  }
+  .form-group input[type="date"],
+  .form-group textarea {
+    width: 100%; background: var(--bg2);
+    border: 1px solid var(--border); border-radius: 6px;
+    color: var(--text); font-family: inherit; font-size: 0.9em;
+    padding: 9px 12px; outline: none;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .form-group input[type="date"]:focus,
+  .form-group textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+  }
+  .form-group textarea { resize: vertical; min-height: 80px; }
+
+  /* photos */
+  .photos-list { display: flex; flex-direction: column; gap: 8px; }
+  .photo-row { display: flex; gap: 6px; align-items: center; }
+  .photo-row input {
+    flex: 1; background: var(--bg2);
+    border: 1px solid var(--border); border-radius: 6px;
+    color: var(--text); font-family: inherit; font-size: 0.82em;
+    padding: 7px 10px; outline: none;
+    transition: border-color .2s;
+  }
+  .photo-row input:focus { border-color: var(--accent); }
+  .photo-row input::placeholder { color: #cbd5e1; }
+  .btn-icon {
+    width: 30px; height: 30px; flex-shrink: 0;
+    border: 1px solid var(--border); border-radius: 6px; background: var(--bg2);
+    cursor: pointer; font-size: 1em; color: var(--muted);
+    display: flex; align-items: center; justify-content: center;
+    transition: background .2s, color .2s;
+  }
+  .btn-icon:hover { background: #fee2e2; color: #ef4444; border-color: #fca5a5; }
+  .btn-icon.add { color: var(--accent); }
+  .btn-icon.add:hover { background: var(--visited-bg); color: var(--accent2); border-color: #93c5fd; }
+  .add-photo-row { margin-top: 6px; }
+  .photo-preview { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .photo-thumb {
+    width: 72px; height: 72px; border-radius: 6px; object-fit: cover;
+    border: 1px solid var(--border); cursor: pointer;
+  }
+  .photo-thumb:hover { opacity: .85; }
+
+  /* panel footer */
+  .panel-footer {
+    padding: 16px 20px; border-top: 1px solid var(--border);
+    display: flex; gap: 8px;
+  }
+  .btn {
+    flex: 1; padding: 10px; border-radius: 6px; font-size: 0.88em;
+    font-weight: 700; font-family: inherit; cursor: pointer;
+    transition: background .2s, transform .1s; border: none;
+  }
+  .btn:hover { transform: translateY(-1px); }
+  .btn-save { background: var(--accent); color: #fff; }
+  .btn-save:hover { background: var(--accent2); }
+  .btn-delete { background: var(--bg2); color: #ef4444; border: 1px solid #fca5a5; flex: 0 0 auto; width: 40px; padding: 0; }
+  .btn-delete:hover { background: #fee2e2; }
+
+  /* ── MODAL (photo fullscreen) ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; z-index: 1000;
+    background: rgba(0,0,0,0.85);
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-overlay img { max-width: 90vw; max-height: 90vh; border-radius: 8px; }
+  .modal-close {
+    position: absolute; top: 20px; right: 24px;
+    background: none; border: none; color: #fff; font-size: 2em;
+    cursor: pointer; line-height: 1;
+  }
+
+  /* responsive */
+  @media (max-width: 700px) {
+    :root { --cell-w: 52px; --cell-h: 36px; }
+    .cell { font-size: 10px; }
+    .panel { position: fixed; top: 0; right: 0; bottom: 0; width: 100%; max-width: 100%; z-index: 300; }
+    .panel.hidden { transform: translateX(100%); }
+    .app-body { height: auto; flex-direction: column; overflow: visible; }
+    .map-wrap { padding: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-back" href="/">← ポートフォリオ</a>
+  <span style="color:var(--border)">|</span>
+  <span class="nav-title">🗾 旅行マップ</span>
+</nav>
+
+<!-- HEADER -->
+<div class="header">
+  <h1>🗾 日本旅行マップ</h1>
+  <div class="stats">
+    <div>
+      <span class="stat-count" id="visited-count">0</span>
+      <span class="stat-label"> / 47 都道府県</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+    </div>
+  </div>
+  <div class="legend" style="margin-top:10px;">
+    <div class="legend-item"><div class="legend-dot" style="background:#f1f5f9;border:1.5px solid #e2e8f0"></div>未訪問</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#dbeafe;border:1.5px solid #93c5fd"></div>訪問済み</div>
+  </div>
+</div>
+
+<!-- BODY -->
+<div class="app-body">
+
+  <!-- MAP -->
+  <div class="map-wrap">
+    <div class="map-grid" id="map-grid"></div>
+  </div>
+
+  <!-- SIDE PANEL -->
+  <div class="panel hidden" id="panel">
+    <div class="panel-header">
+      <div>
+        <h2 id="panel-name">—</h2>
+        <div class="panel-region" id="panel-region"></div>
+      </div>
+      <button class="panel-close" id="panel-close">✕</button>
+    </div>
+    <div class="panel-body" id="panel-body">
+      <div class="panel-empty">
+        <div class="panel-empty-icon">📍</div>
+        <div>都道府県をクリックして<br>訪問情報を登録しましょう</div>
+      </div>
+    </div>
+    <div class="panel-footer" id="panel-footer" style="display:none">
+      <button class="btn btn-save" id="btn-save">保存する</button>
+      <button class="btn btn-delete" id="btn-delete" title="記録を削除">🗑</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- PHOTO MODAL -->
+<div class="modal-overlay" id="photo-modal">
+  <button class="modal-close" id="modal-close">✕</button>
+  <img id="modal-img" src="" alt="">
+</div>
+
+<script>
+/* ───────── Prefecture data ───────── */
+const PREFS = [
+  {id:'hokkaido', name:'北海道', col:9,  row:0,  region:'北海道'},
+  {id:'aomori',   name:'青森',   col:8,  row:1,  region:'東北'},
+  {id:'iwate',    name:'岩手',   col:9,  row:2,  region:'東北'},
+  {id:'miyagi',   name:'宮城',   col:8,  row:3,  region:'東北'},
+  {id:'akita',    name:'秋田',   col:7,  row:2,  region:'東北'},
+  {id:'yamagata', name:'山形',   col:7,  row:3,  region:'東北'},
+  {id:'fukushima',name:'福島',   col:8,  row:4,  region:'東北'},
+  {id:'ibaraki',  name:'茨城',   col:9,  row:5,  region:'関東'},
+  {id:'tochigi',  name:'栃木',   col:8,  row:5,  region:'関東'},
+  {id:'gunma',    name:'群馬',   col:7,  row:5,  region:'関東'},
+  {id:'saitama',  name:'埼玉',   col:8,  row:6,  region:'関東'},
+  {id:'chiba',    name:'千葉',   col:9,  row:6,  region:'関東'},
+  {id:'tokyo',    name:'東京',   col:8,  row:7,  region:'関東'},
+  {id:'kanagawa', name:'神奈川', col:8,  row:8,  region:'関東'},
+  {id:'niigata',  name:'新潟',   col:6,  row:4,  region:'中部'},
+  {id:'toyama',   name:'富山',   col:6,  row:5,  region:'中部'},
+  {id:'ishikawa', name:'石川',   col:5,  row:5,  region:'中部'},
+  {id:'fukui',    name:'福井',   col:5,  row:6,  region:'中部'},
+  {id:'yamanashi',name:'山梨',   col:7,  row:7,  region:'中部'},
+  {id:'nagano',   name:'長野',   col:7,  row:6,  region:'中部'},
+  {id:'gifu',     name:'岐阜',   col:6,  row:6,  region:'中部'},
+  {id:'shizuoka', name:'静岡',   col:7,  row:8,  region:'中部'},
+  {id:'aichi',    name:'愛知',   col:6,  row:7,  region:'中部'},
+  {id:'mie',      name:'三重',   col:6,  row:8,  region:'近畿'},
+  {id:'shiga',    name:'滋賀',   col:5,  row:7,  region:'近畿'},
+  {id:'kyoto',    name:'京都',   col:4,  row:7,  region:'近畿'},
+  {id:'osaka',    name:'大阪',   col:4,  row:8,  region:'近畿'},
+  {id:'hyogo',    name:'兵庫',   col:3,  row:7,  region:'近畿'},
+  {id:'nara',     name:'奈良',   col:5,  row:8,  region:'近畿'},
+  {id:'wakayama', name:'和歌山', col:5,  row:9,  region:'近畿'},
+  {id:'tottori',  name:'鳥取',   col:3,  row:8,  region:'中国'},
+  {id:'shimane',  name:'島根',   col:2,  row:8,  region:'中国'},
+  {id:'okayama',  name:'岡山',   col:3,  row:9,  region:'中国'},
+  {id:'hiroshima',name:'広島',   col:2,  row:9,  region:'中国'},
+  {id:'yamaguchi',name:'山口',   col:1,  row:9,  region:'中国'},
+  {id:'tokushima',name:'徳島',   col:5,  row:10, region:'四国'},
+  {id:'kagawa',   name:'香川',   col:4,  row:10, region:'四国'},
+  {id:'ehime',    name:'愛媛',   col:3,  row:10, region:'四国'},
+  {id:'kochi',    name:'高知',   col:4,  row:11, region:'四国'},
+  {id:'fukuoka',  name:'福岡',   col:1,  row:10, region:'九州'},
+  {id:'saga',     name:'佐賀',   col:0,  row:10, region:'九州'},
+  {id:'nagasaki', name:'長崎',   col:0,  row:11, region:'九州'},
+  {id:'kumamoto', name:'熊本',   col:1,  row:11, region:'九州'},
+  {id:'oita',     name:'大分',   col:2,  row:10, region:'九州'},
+  {id:'miyazaki', name:'宮崎',   col:2,  row:11, region:'九州'},
+  {id:'kagoshima',name:'鹿児島', col:1,  row:12, region:'九州'},
+  {id:'okinawa',  name:'沖縄',   col:0,  row:14, region:'沖縄'},
+];
+
+/* ───────── State ───────── */
+const LS_KEY = 'travel_map_v1';
+let data = {};
+let activeId = null;
+
+function load() {
+  try { data = JSON.parse(localStorage.getItem(LS_KEY)) || {}; } catch(e) { data = {}; }
+}
+function save() {
+  localStorage.setItem(LS_KEY, JSON.stringify(data));
+}
+
+/* ───────── Google Drive URL → image URL ───────── */
+function toImageUrl(url) {
+  url = url.trim();
+  const m1 = url.match(/\/d\/([\w-]+)/);
+  if (m1) return `https://drive.google.com/uc?export=view&id=${m1[1]}`;
+  const m2 = url.match(/[?&]id=([\w-]+)/);
+  if (m2) return `https://drive.google.com/uc?export=view&id=${m2[1]}`;
+  return url;
+}
+
+/* ───────── Build map ───────── */
+function buildMap() {
+  const grid = document.getElementById('map-grid');
+  grid.innerHTML = '';
+  PREFS.forEach(p => {
+    const el = document.createElement('div');
+    el.className = 'cell' + (data[p.id] ? ' visited' : '');
+    if (activeId === p.id) el.classList.add('active');
+    el.dataset.id = p.id;
+    el.dataset.region = p.region;
+    el.style.gridColumn = `${p.col + 1}`;
+    el.style.gridRow    = `${p.row + 1}`;
+    el.textContent = p.name;
+    el.title = p.name + (data[p.id] && data[p.id].date ? ` — ${data[p.id].date}` : '');
+    el.addEventListener('click', () => openPanel(p.id));
+    grid.appendChild(el);
+  });
+  updateStats();
+}
+
+function updateStats() {
+  const count = Object.keys(data).filter(k => data[k]).length;
+  document.getElementById('visited-count').textContent = count;
+  document.getElementById('progress-fill').style.width = (count / 47 * 100) + '%';
+}
+
+/* ───────── Panel ───────── */
+function openPanel(id) {
+  activeId = id;
+  const p = PREFS.find(x => x.id === id);
+  const panel = document.getElementById('panel');
+  panel.classList.remove('hidden');
+
+  document.getElementById('panel-name').textContent = p.name;
+  document.getElementById('panel-region').textContent = p.region + '地方';
+
+  renderPanelBody(id);
+  buildMap();
+}
+
+function closePanel() {
+  activeId = null;
+  document.getElementById('panel').classList.add('hidden');
+  buildMap();
+}
+
+function renderPanelBody(id) {
+  const d = data[id] || {};
+  const body = document.getElementById('panel-body');
+  const footer = document.getElementById('panel-footer');
+  footer.style.display = 'flex';
+
+  const photos = d.photos || [];
+  body.innerHTML = `
+    <div class="form-group">
+      <label>訪問日</label>
+      <input type="date" id="f-date" value="${d.date || ''}">
+    </div>
+    <div class="form-group">
+      <label>メモ</label>
+      <textarea id="f-memo" placeholder="感想・行った場所など">${d.memo || ''}</textarea>
+    </div>
+    <div class="form-group">
+      <label>写真（Google Drive 共有リンク）</label>
+      <div class="photos-list" id="photos-list">
+        ${photos.map((url, i) => photoRow(url, i)).join('')}
+      </div>
+      <div class="add-photo-row">
+        <button class="btn-icon add" onclick="addPhotoRow()" title="写真を追加">＋</button>
+      </div>
+      <div class="photo-preview" id="photo-preview">
+        ${photos.map(url => `<img class="photo-thumb" src="${toImageUrl(url)}" onerror="this.style.display='none'" onclick="openPhoto('${toImageUrl(url)}')">`).join('')}
+      </div>
+    </div>
+  `;
+  updateDeleteBtn(id);
+}
+
+function photoRow(url, i) {
+  return `<div class="photo-row" id="pr-${i}">
+    <input type="text" placeholder="https://drive.google.com/file/d/..." value="${url}" onchange="updatePhotoPreview()">
+    <button class="btn-icon" onclick="removePhotoRow(${i})" title="削除">✕</button>
+  </div>`;
+}
+
+function addPhotoRow() {
+  const list = document.getElementById('photos-list');
+  const i = list.children.length;
+  const div = document.createElement('div');
+  div.innerHTML = photoRow('', i);
+  list.appendChild(div.firstElementChild);
+}
+
+function removePhotoRow(i) {
+  const el = document.getElementById('pr-' + i);
+  if (el) el.remove();
+  updatePhotoPreview();
+}
+
+function updatePhotoPreview() {
+  const urls = getPhotoUrls();
+  const preview = document.getElementById('photo-preview');
+  if (!preview) return;
+  preview.innerHTML = urls.filter(u => u).map(url =>
+    `<img class="photo-thumb" src="${toImageUrl(url)}" onerror="this.style.display='none'" onclick="openPhoto('${toImageUrl(url)}')">`
+  ).join('');
+}
+
+function getPhotoUrls() {
+  const list = document.getElementById('photos-list');
+  if (!list) return [];
+  return Array.from(list.querySelectorAll('input')).map(i => i.value.trim()).filter(v => v);
+}
+
+function updateDeleteBtn(id) {
+  const btn = document.getElementById('btn-delete');
+  btn.style.display = data[id] ? 'block' : 'none';
+}
+
+/* ───────── Save / Delete ───────── */
+document.getElementById('btn-save').addEventListener('click', () => {
+  if (!activeId) return;
+  data[activeId] = {
+    visited: true,
+    date:    document.getElementById('f-date').value,
+    memo:    document.getElementById('f-memo').value,
+    photos:  getPhotoUrls(),
+  };
+  save();
+  buildMap();
+  renderPanelBody(activeId);
+  flashSave();
+});
+
+document.getElementById('btn-delete').addEventListener('click', () => {
+  if (!activeId) return;
+  if (!confirm(`${PREFS.find(p=>p.id===activeId).name} の記録を削除しますか？`)) return;
+  delete data[activeId];
+  save();
+  buildMap();
+  renderPanelBody(activeId);
+  updateDeleteBtn(activeId);
+});
+
+document.getElementById('panel-close').addEventListener('click', closePanel);
+
+function flashSave() {
+  const btn = document.getElementById('btn-save');
+  btn.textContent = '保存しました ✓';
+  btn.style.background = '#16a34a';
+  setTimeout(() => { btn.textContent = '保存する'; btn.style.background = ''; }, 1800);
+}
+
+/* ───────── Photo modal ───────── */
+function openPhoto(url) {
+  document.getElementById('modal-img').src = url;
+  document.getElementById('photo-modal').classList.add('open');
+}
+document.getElementById('modal-close').addEventListener('click', () => {
+  document.getElementById('photo-modal').classList.remove('open');
+});
+document.getElementById('photo-modal').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) e.currentTarget.classList.remove('open');
+});
+
+/* ───────── Init ───────── */
+load();
+buildMap();
+</script>
+</body>
+</html>
