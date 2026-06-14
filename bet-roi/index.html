@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>実ROI — 認証</title>
+<style>
+  :root {
+    --bg: #080c08; --bg2: #0d130d; --bg3: #111a11;
+    --green: #00e676; --green2: #00c853; --green-dim: #1a4d2e;
+    --text: #e8f5e9; --muted: #6a8f72; --border: #1e3a1e;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Hiragino Kaku Gothic Pro', Meiryo, sans-serif;
+    background: var(--bg); color: var(--text);
+    min-height: 100vh; display: flex;
+    align-items: center; justify-content: center;
+  }
+  .gate {
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 12px; padding: 48px 40px;
+    width: 100%; max-width: 360px; text-align: center;
+  }
+  .gate-icon { font-size: 2.4em; margin-bottom: 20px; }
+  .gate h1 { font-size: 1.2em; color: var(--green); margin-bottom: 8px; }
+  .gate p { font-size: 0.85em; color: var(--muted); margin-bottom: 32px; }
+  input[type="password"] {
+    width: 100%; background: var(--bg2);
+    border: 1px solid var(--border); border-radius: 6px;
+    color: var(--text); font-size: 1.2em; letter-spacing: 0.3em;
+    padding: 12px 16px; text-align: center; outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    margin-bottom: 16px;
+  }
+  input[type="password"]:focus {
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px rgba(0,230,118,0.12);
+  }
+  button {
+    width: 100%; background: var(--green); color: var(--bg);
+    border: none; border-radius: 6px; font-size: 1em; font-weight: bold;
+    padding: 12px; cursor: pointer; transition: background 0.2s;
+  }
+  button:hover { background: var(--green2); }
+  .error {
+    color: #ef5350; font-size: 0.82em;
+    margin-top: 12px; display: none;
+  }
+  .back { margin-top: 24px; }
+  .back a { color: var(--muted); font-size: 0.82em; text-decoration: none; }
+  .back a:hover { color: var(--green); }
+</style>
+</head>
+<body>
+<div class="gate">
+  <div class="gate-icon">🔒</div>
+  <h1>実ROI データ</h1>
+  <p>閲覧にはパスワードが必要です。</p>
+  <input type="password" id="pw" placeholder="••••" autofocus>
+  <button onclick="check()">確認する →</button>
+  <div class="error" id="err">パスワードが違います</div>
+  <div class="back"><a href="/">← ポートフォリオに戻る</a></div>
+</div>
+
+<script>
+const HASH = '62a7722a6980745a3ef86f0c7a14a0216b674dcb49ef898bed75777f61addd94';
+const DEST  = 'https://keiba-dragon.github.io/horse_racing_ai/actual_bet_roi.html';
+
+async function sha256(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+async function check() {
+  const pw = document.getElementById('pw').value;
+  const h  = await sha256(pw);
+  if (h === HASH) {
+    window.location.href = DEST;
+  } else {
+    document.getElementById('err').style.display = 'block';
+    document.getElementById('pw').value = '';
+    document.getElementById('pw').focus();
+  }
+}
+
+document.getElementById('pw').addEventListener('keydown', e => {
+  if (e.key === 'Enter') check();
+});
+</script>
+</body>
+</html>
