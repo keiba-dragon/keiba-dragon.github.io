@@ -21,15 +21,25 @@
   <div class="stats">
     <div>
       <span class="stat-count" id="visited-count">0</span>
-      <span class="stat-label"> / 47 都道府県</span>
+      <span class="stat-label"> / 47 都道府県 ·</span>
+      <span class="stat-count" id="total-visits" style="font-size:1.1em">0</span>
+      <span class="stat-label"> 回訪問</span>
     </div>
     <div class="progress-bar">
       <div class="progress-fill" id="progress-fill" style="width:0%"></div>
     </div>
   </div>
-  <div class="legend">
-    <div class="legend-item"><div class="legend-dot unvisited"></div>未訪問</div>
-    <div class="legend-item"><div class="legend-dot visited"></div>訪問済み</div>
+  <div class="header-actions">
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot unvisited"></div>未訪問</div>
+      <div class="legend-item"><div class="legend-dot visited"></div>訪問済み</div>
+    </div>
+    <div class="io-btns">
+      <button class="btn-io" id="btn-export">⬇ エクスポート</button>
+      <label class="btn-io" id="btn-import-label">⬆ インポート
+        <input type="file" id="import-file" accept=".json" style="display:none">
+      </label>
+    </div>
   </div>
 </div>
 
@@ -44,22 +54,14 @@
   <!-- SIDE PANEL -->
   <div class="panel hidden" id="panel">
     <div class="panel-header">
-      <div>
+      <div id="panel-header-content">
         <h2 id="panel-name">—</h2>
         <div class="panel-region" id="panel-region"></div>
       </div>
       <button class="panel-close" id="panel-close">✕</button>
     </div>
-    <div class="panel-body" id="panel-body">
-      <div class="panel-empty">
-        <div class="panel-empty-icon">📍</div>
-        <div>都道府県をクリックして<br>訪問情報を登録しましょう</div>
-      </div>
-    </div>
-    <div class="panel-footer" id="panel-footer" style="display:none">
-      <button class="btn btn-save" id="btn-save">保存する</button>
-      <button class="btn btn-delete" id="btn-delete" title="記録を削除">🗑</button>
-    </div>
+    <div class="panel-body" id="panel-body"></div>
+    <div class="panel-footer" id="panel-footer"></div>
   </div>
 
 </div>
